@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- The M of Memory drawn as two machines: the solid and the faded half flow into one shared node -->
+  <style>
+    .tile { fill: #2e5be4 }
+    @media (prefers-color-scheme: dark) { .tile { fill: #3c6cdc } }
+  </style>
+  <defs>
+    <!-- Cuts a gap around the node so it reads apart from the strokes at 16px -->
+    <mask id="vm-node-gap" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32">
+      <rect width="32" height="32" fill="#fff"/>
+      <circle cx="16" cy="21" r="5.5" fill="#000"/>
+    </mask>
+  </defs>
+  <rect class="tile" width="32" height="32" rx="7"/>
+  <g fill="none" stroke="#eff6ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" mask="url(#vm-node-gap)">
+    <path d="M24 24V8l-8 10" stroke-opacity=".5"/>
+    <path d="M8 24V8l8 10"/>
+  </g>
+  <circle cx="16" cy="21" r="4.5" fill="#eff6ff"/>
+</svg>

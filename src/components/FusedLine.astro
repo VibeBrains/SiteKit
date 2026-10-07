@@ -1,0 +1,44 @@
+---
+import type { Lang } from '../languages'
+
+/**
+ * The fused line of a hero: each word turns one letter inside out, a plate with the letter cut out
+ * The letter is the first of a list it holds, widest counters first — a narrow letter in a plate reads as a bar
+ * A one-letter word keeps its letter: a whole word in a plate is a square, not a word
+ * The whole text is the accessible name and the `data-fused` mark lets the locale gate put the line back together
+ */
+interface Props {
+  text: string
+  lang: Lang
+}
+
+const { text, lang } = Astro.props
+
+const PLATE_LETTERS = 'АОДРВБСМAODRBCM'
+const plated = (word: string) => {
+  if (word.length < 2) {
+    return { before: word, letter: '', after: '' }
+  }
+  const upper = word.toLocaleUpperCase(lang)
+  const at = [...PLATE_LETTERS].map((letter) => upper.indexOf(letter)).find((index) => index >= 0) ?? -1
+  return at < 0
+    ? { before: word, letter: '', after: '' }
+    : { before: word.slice(0, at), letter: word[at], after: word.slice(at + 1) }
+}
+const words = text.split(' ').map(plated)
+---
+
+<span class="ln fused" data-fused aria-label={text}>
+  {
+    words.map((word, index) => (
+      <>
+        {index > 0 && ' '}
+        <span class="word" aria-hidden="true">
+          {word.before}
+          {word.letter && <span class="plate">{word.letter}</span>}
+          {word.after}
+        </span>
+      </>
+    ))
+  }
+</span>

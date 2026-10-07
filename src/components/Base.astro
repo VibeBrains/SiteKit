@@ -1,0 +1,78 @@
+---
+import '../styles/base.css'
+import { BASE_LANG, languages, langPaths, langTags, type Lang } from '../languages'
+
+/**
+ * Page shell of a family landing: head, early language script and the skip link
+ * Texts come from the site's catalog as props; the site's own styles and scripts go into the slot
+ */
+interface Props {
+  lang: Lang
+  title: string
+  description: string
+  /** Caption of the skip-to-content link */
+  skip: string
+  /** localStorage key of the explicitly picked language */
+  storageKey: string
+  themeColor: string
+  /** Vector favicon, when the site has one */
+  faviconSvg?: string
+  /** Picture for link previews, when the site has one */
+  ogImage?: string
+}
+
+const { lang, title, description, skip, storageKey, themeColor, faviconSvg, ogImage } = Astro.props
+const site = Astro.site ?? new URL(Astro.url.origin)
+const canonical = new URL(langPaths[lang], site).href
+const isBase = lang === BASE_LANG
+---
+
+
+<!doctype html>
+<html lang={langTags[lang]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content={themeColor} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {languages.map((code) => <link rel="alternate" hreflang={langTags[code]} href={new URL(langPaths[code], site).href} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(langPaths[BASE_LANG], site).href} />
+    {faviconSvg && <link rel="icon" href={faviconSvg} type="image/svg+xml" />}
+    <link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={langTags[lang]} />
+    {ogImage && <meta property="og:image" content={new URL(ogImage, site).href} />}
+    {ogImage && <meta name="twitter:card" content="summary_large_image" />}
+
+    <!--
+      Runs before the first paint:
+      marks that scripts work (reveal-on-scroll hides content only then)
+      and, on the base-language page only, honours a language the visitor picked explicitly earlier
+      The browser language is never consulted: Russian stays the default
+    -->
+    <script is:inline define:vars={{ storageKey, isBase, paths: langPaths }}>
+      document.documentElement.classList.add('js')
+      if (isBase) {
+        try {
+          const picked = localStorage.getItem(storageKey)
+          if (picked && picked in paths && paths[picked] !== location.pathname) {
+            location.replace(paths[picked] + location.hash)
+          }
+        } catch {
+          // Storage can be blocked: the base language is the right answer then
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{skip}</a>
+    <slot />
+  </body>
+</html>

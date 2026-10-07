@@ -1,0 +1,148 @@
+---
+import { languages, langPaths, langTags, type Lang } from '../languages'
+import type { NavLink, LangNames } from './Header.astro'
+
+/** Footer of a family landing: logo and tagline, links, copyright and the language list; the mark goes into `logo` */
+interface Props {
+  lang: Lang
+  brand: string
+  homeLabel: string
+  tagline: string
+  navLabel: string
+  links: readonly NavLink[]
+  copyright: string
+  langLabel: string
+  langNames: LangNames
+}
+
+const { lang, brand, homeLabel, tagline, navLabel, links, copyright, langLabel, langNames } = Astro.props
+---
+
+
+<footer class="footer">
+  <div class="container footer-row">
+    <div class="brand">
+      <a class="logo" href={langPaths[lang]} aria-label={homeLabel}>
+        <slot name="logo" />
+        <span aria-hidden="true">{brand}</span>
+      </a>
+      <p class="tagline">{tagline}</p>
+    </div>
+    <nav aria-label={navLabel}>
+      <ul class="links">
+        {
+          links.map((link) => (
+            <li>
+              <a href={link.href} rel={link.rel}>{link.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <div class="bottom">
+      <p>{copyright}</p>
+      <ul class="langs" aria-label={langLabel}>
+        {
+          languages.map((code) => (
+            <li>
+              <a
+                href={langPaths[code]}
+                hreflang={langTags[code]}
+                lang={langTags[code]}
+                aria-current={code === lang ? 'true' : undefined}
+                data-lang-pick={code}
+              >
+                {langNames[code].name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: 48px 32px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-soft);
+  }
+
+  .footer-row {
+    display: grid;
+    gap: 28px;
+  }
+
+  @media (min-width: 800px) {
+    .footer-row {
+      grid-template-columns: 1fr auto;
+      align-items: start;
+    }
+
+    .bottom {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .brand {
+    display: grid;
+    gap: 10px;
+  }
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    justify-self: start;
+    color: var(--fg);
+    font-family: var(--font-accent);
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .tagline {
+    color: var(--fg-muted);
+    font-size: 15px;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+  }
+
+  .links a,
+  .langs a {
+    display: inline-flex;
+    min-height: 32px;
+    align-items: center;
+    color: var(--fg-muted);
+    font-size: 15px;
+  }
+
+  .links a:hover,
+  .langs a:hover {
+    color: var(--fg);
+  }
+
+  .langs a[aria-current='true'] {
+    color: var(--fg);
+  }
+
+  .bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--fg-faint);
+    font-size: 14px;
+  }
+
+  .langs {
+    display: flex;
+    gap: 16px;
+  }
+</style>

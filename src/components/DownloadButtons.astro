@@ -1,0 +1,75 @@
+---
+/** One download button: texts come from the site's catalog, the build from the site's releases */
+export interface DownloadButton {
+  os: string
+  title: string
+  /** Caption under the title: the build's kind, version and size, or the fallback when the build is unknown */
+  sub: string
+  /** Catalog template of the caption: the browser fills it again when a newer build is out */
+  template: string
+  href: string
+  primary: boolean
+}
+
+/**
+ * Download buttons of a landing, one per platform
+ * The browser refreshes them from GitHub (`initLiveReleases`), so a release made after the deploy is offered too
+ */
+interface Props {
+  buttons: readonly DownloadButton[]
+}
+
+const { buttons } = Astro.props
+---
+
+
+<div class="downloads">
+  {
+    buttons.map((button) => (
+      <a
+        class:list={['btn', 'btn--lg', 'download', button.primary ? 'btn--primary' : 'btn--ghost']}
+        href={button.href}
+        data-dl={button.os}
+        rel="noopener"
+      >
+        <span class="download-title">{button.title}</span>
+        <span class="download-sub" data-dl-sub={button.os} data-template={button.template}>
+          {button.sub}
+        </span>
+      </a>
+    ))
+  }
+</div>
+
+<style>
+  .downloads {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .download {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: var(--download-min, 236px);
+    white-space: normal;
+  }
+
+  .download-title {
+    font-size: 17px;
+  }
+
+  .download-sub {
+    color: rgb(255 255 255 / 0.72);
+    font-family: var(--font-accent);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 520px) {
+    .download {
+      width: 100%;
+    }
+  }
+</style>

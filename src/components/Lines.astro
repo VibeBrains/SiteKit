@@ -1,0 +1,14 @@
+---
+/**
+ * Renders a catalog string one sentence per line
+ * Catalog strings separate sentences with a newline; each one becomes its own block
+ */
+interface Props {
+  text: string
+}
+
+const { text } = Astro.props
+const lines = text.split('\n')
+---
+
+{lines.map((line) => <span class="ln">{line}</span>)}

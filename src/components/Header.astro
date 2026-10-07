@@ -1,0 +1,227 @@
+---
+import { languages, langPaths, langTags, type Lang } from '../languages'
+
+/** One link of the header menu or footer list; texts come from the site's catalog */
+export interface NavLink {
+  href: string
+  label: string
+  rel?: string
+}
+
+/** One button of the header actions: the ghost one hides on narrow screens, the primary one stays */
+export interface HeaderAction extends NavLink {
+  kind: 'ghost' | 'primary'
+}
+
+/** Short code and full name of each language in the switcher, from the site's catalog */
+export type LangNames = Record<Lang, { code: string; name: string }>
+
+/**
+ * Sticky header of a family landing: logo, section menu, language switcher and two actions
+ * The mark goes into the `logo` slot: each product draws its own
+ */
+interface Props {
+  lang: Lang
+  brand: string
+  homeLabel: string
+  navLabel: string
+  nav: readonly NavLink[]
+  langLabel: string
+  langNames: LangNames
+  actions: readonly HeaderAction[]
+}
+
+const { lang, brand, homeLabel, navLabel, nav, langLabel, langNames, actions } = Astro.props
+---
+
+
+<header class="header">
+  <div class="container header-row">
+    <a class="logo" href={langPaths[lang]} aria-label={homeLabel}>
+      <slot name="logo" />
+      <span class="logo-word" aria-hidden="true">{brand}</span>
+    </a>
+
+    <nav class="nav" aria-label={navLabel}>
+      {nav.map((item) => <a href={item.href} rel={item.rel}>{item.label}</a>)}
+    </nav>
+
+    <div class="actions">
+      <div class="lang" role="group" aria-label={langLabel}>
+        {
+          languages.map((code, i) => (
+            <>
+              {i > 0 && (
+                <span class="lang-sep" aria-hidden="true">
+                  |
+                </span>
+              )}
+              <a
+                class="lang-link"
+                href={langPaths[code]}
+                hreflang={langTags[code]}
+                lang={langTags[code]}
+                aria-label={langNames[code].name}
+                aria-current={code === lang ? 'true' : undefined}
+                data-lang-pick={code}
+              >
+                {langNames[code].code}
+              </a>
+            </>
+          ))
+        }
+      </div>
+      {
+        actions.map((action) => (
+          <a
+            class:list={['btn', action.kind === 'ghost' ? 'btn--ghost sign-in' : 'btn--primary start']}
+            href={action.href}
+            rel={action.rel}
+          >
+            {action.label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--border);
+    background: var(--header-bg, rgb(9 9 11 / 0.72));
+    backdrop-filter: saturate(160%) blur(14px);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+  }
+
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: var(--header-h);
+  }
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: auto;
+    color: var(--fg);
+    border-radius: 8px;
+  }
+
+  .logo-word {
+    font-family: var(--font-accent);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .logo:hover {
+    color: var(--brand-bright);
+  }
+
+  .nav {
+    display: none;
+    gap: 28px;
+    margin-right: 12px;
+  }
+
+  .nav a {
+    color: var(--fg-muted);
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .nav a:hover {
+    color: var(--fg);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-family: var(--font-accent);
+    font-size: 14px;
+  }
+
+  .lang-sep {
+    color: var(--fg-faint);
+  }
+
+  .lang-link {
+    display: inline-flex;
+    align-items: center;
+    min-width: 32px;
+    min-height: 40px;
+    justify-content: center;
+    color: var(--fg-muted);
+  }
+
+  .lang-link[aria-current='true'] {
+    color: var(--fg);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--brand);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+
+  .lang-link:hover {
+    color: var(--fg);
+  }
+
+  .btn {
+    min-height: 40px;
+    padding: 8px 14px;
+    font-size: 15px;
+  }
+
+  .sign-in {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .sign-in {
+      display: inline-flex;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .nav {
+      display: flex;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .header-row {
+      gap: 8px;
+    }
+
+    .logo-word {
+      font-size: 16px;
+    }
+
+    .actions {
+      gap: 6px;
+    }
+
+    .btn {
+      padding-inline: 10px;
+      font-size: 14px;
+    }
+
+    .lang-link {
+      min-width: 26px;
+    }
+  }
+</style>

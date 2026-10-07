@@ -1,0 +1,38 @@
+{
+  "name": "@vibebrains/site-kit",
+  "version": "0.1.0",
+  "description": "Общий каркас лендингов семейства Vibe: i18n, гейт локализации, базовые стили, шапка, подвал, релизы, выкладка",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "files": [
+    "src",
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    "./languages": "./src/languages.ts",
+    "./i18n": "./src/i18n.ts",
+    "./releases": "./src/releases.ts",
+    "./brands": "./src/brands.ts",
+    "./gate": "./src/gate.ts",
+    "./scripts/*": "./src/scripts/*.ts",
+    "./components/*": "./src/components/*",
+    "./styles/base.css": "./src/styles/base.css"
+  },
+  "bin": {
+    "site-deploy": "./bin/siteDeploy.sh"
+  },
+  "peerDependencies": {
+    "astro": ">=7"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.2",
+    "astro": "^7.3.5",
+    "typescript": "^6",
+    "@astrojs/check": "^0.9.10"
+  },
+  "scripts": {
+    "check": "astro check"
+  }
+}

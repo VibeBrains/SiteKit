@@ -1,0 +1,313 @@
+/*
+ * Base of the family landings: reset, layout, buttons, section heads, the fused line and appear-on-scroll
+ * Everything here reads the site's tokens (colours, fonts, radii) and sits in the `kit` layer,
+ * so the site's theme and its components override it without fighting specificity
+ * Tokens the site defines, its narrow-screen values too: --bg, --fg*, --surface*, --border*, --brand*, --font-*, --radius*, --container,
+ * --gutter, --header-h, --section-y, --ease-out; optional: --btn-primary-bg, --btn-primary-hover, --title-leading,
+ * --title-tracking, --gradient, --header-bg, --fused-*
+ */
+@layer kit {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--bg);
+    scroll-padding-top: calc(var(--header-h) + 16px);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--bg);
+    color: var(--fg-soft);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* Decorative glows bleed past the viewport edge: clip them so the page never scrolls sideways */
+    overflow-x: clip;
+  }
+
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  h1,
+  h2,
+  h3,
+  p,
+  ul,
+  ol,
+  figure,
+  dl,
+  dd {
+    margin: 0;
+  }
+
+  ul,
+  ol {
+    padding: 0;
+    list-style: none;
+  }
+
+  h1,
+  h2,
+  h3 {
+    color: var(--fg);
+    font-family: var(--font-title);
+    font-weight: 700;
+    line-height: var(--title-leading, 1.12);
+    letter-spacing: var(--title-tracking, -0.01em);
+    text-wrap: balance;
+  }
+
+  a {
+    color: var(--brand-bright);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand-bright);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  ::selection {
+    background: var(--brand);
+    color: var(--brand-ink);
+  }
+
+  /* One catalog line is one sentence, and every sentence starts on its own line */
+  .ln {
+    display: block;
+  }
+
+  .container {
+    width: 100%;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .section {
+    padding-block: var(--section-y);
+    position: relative;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--brand-bright);
+    font-family: var(--font-accent);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .eyebrow::before {
+    content: '';
+    width: 18px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+
+  .section-head {
+    display: grid;
+    gap: 16px;
+    max-width: 760px;
+    margin-bottom: 56px;
+  }
+
+  .section-head--center {
+    margin-inline: auto;
+    text-align: center;
+    justify-items: center;
+  }
+
+  .section-title {
+    font-size: clamp(30px, 4.4vw, 48px);
+  }
+
+  .section-lead {
+    color: var(--fg-muted);
+    font-size: 18px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 20px;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    font: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s,
+      color 0.2s,
+      box-shadow 0.2s,
+      transform 0.2s var(--ease-out);
+  }
+
+  .btn--primary {
+    background: var(--btn-primary-bg, var(--brand));
+    color: #fff;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.08) inset,
+      0 8px 28px -8px var(--brand-glow);
+  }
+
+  .btn--primary:hover {
+    background: var(--btn-primary-hover, var(--brand-hover));
+    color: #fff;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.12) inset,
+      0 10px 36px -6px var(--brand-glow);
+  }
+
+  .btn--ghost {
+    border-color: var(--border-strong);
+    background: rgb(255 255 255 / 0.03);
+    color: var(--fg);
+  }
+
+  .btn--ghost:hover {
+    border-color: rgb(255 255 255 / 0.3);
+    background: rgb(255 255 255 / 0.07);
+    color: var(--fg);
+  }
+
+  .btn--lg {
+    min-height: 52px;
+    padding: 14px 26px;
+    font-size: 17px;
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+  }
+
+  .skip-link {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 100;
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    background: var(--brand);
+    color: #fff;
+    transform: translateY(-200%);
+  }
+
+  .skip-link:focus {
+    transform: none;
+    color: #fff;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /*
+   * Appear-on-scroll: content is visible by default
+   * It is hidden only when scripts run and motion is welcome, so no-JS and reduced-motion visitors always see it
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .js [data-reveal] {
+      transition:
+        opacity 0.7s var(--ease-out),
+        transform 0.7s var(--ease-out);
+      transition-delay: calc(var(--reveal-i, 0) * 90ms);
+    }
+
+    .js [data-reveal]:not(.is-visible) {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+  }
+
+  /* Text painted with the site's brand gradient */
+  .gradient-text {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  code,
+  .mono {
+    font-family: var(--font-accent);
+    font-size: 0.92em;
+  }
+
+  /*
+   * The fused line: heavy condensed capitals set so tight they touch, and in each word one letter turned inside out —
+   * a plate of the line's paint with the letter cut out. One such line a page: a spice, not the dish
+   * Paint, plate and size are the site's: --fused-fill, --fused-plate, --fused-size, --fused-gap
+   */
+  .fused {
+    display: block;
+    margin-top: var(--fused-gap, 0.08em);
+    background: var(--fused-fill, linear-gradient(currentColor, currentColor));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-family: var(--font-fused);
+    font-weight: 400;
+    font-size: var(--fused-size, 1.22em);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+  }
+
+  .fused .word {
+    white-space: nowrap;
+  }
+
+  .fused .plate {
+    display: inline-block;
+    margin: 0 0.01em;
+    padding: 0.06em 0.03em 0;
+    line-height: 0.86;
+    background: var(--fused-plate);
+    color: var(--bg);
+    -webkit-text-fill-color: var(--bg);
+  }
+}
