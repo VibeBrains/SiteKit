@@ -1,6 +1,7 @@
 ---
 import '../styles/base.css'
 import { BASE_LANG, languages, langPaths, langTags, type Lang } from '../languages'
+import type { ColorModeOptions } from '../colorMode'
 
 /**
  * Page shell of a family landing: head, early language script and the skip link
@@ -19,9 +20,15 @@ interface Props {
   faviconSvg?: string
   /** Picture for link previews, when the site has one */
   ogImage?: string
+  /**
+   * Day and night: without it the page is dark only, as every landing was before
+   * With it the page follows the visitor's mode — see `colorMode.ts` and `scripts/colorMode`
+   */
+  colorMode?: ColorModeOptions
 }
 
-const { lang, title, description, skip, storageKey, themeColor, faviconSvg, ogImage } = Astro.props
+const { lang, title, description, skip, storageKey, themeColor, faviconSvg, ogImage, colorMode } = Astro.props
+const colorCookie = colorMode?.cookie ?? null
 const site = Astro.site ?? new URL(Astro.url.origin)
 const canonical = new URL(langPaths[lang], site).href
 const isBase = lang === BASE_LANG
@@ -33,8 +40,19 @@ const isBase = lang === BASE_LANG
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content={themeColor} />
+    <meta name="color-scheme" content={colorMode ? 'light dark' : 'dark'} />
+    {
+      colorMode ? (
+        <meta
+          name="theme-color"
+          content={colorMode.themeColors.dark}
+          data-light={colorMode.themeColors.light}
+          data-dark={colorMode.themeColors.dark}
+        />
+      ) : (
+        <meta name="theme-color" content={themeColor} />
+      )
+    }
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -57,8 +75,16 @@ const isBase = lang === BASE_LANG
       and, on the base-language page only, honours a language the visitor picked explicitly earlier
       The browser language is never consulted: Russian stays the default
     -->
-    <script is:inline define:vars={{ storageKey, isBase, paths: langPaths }}>
+    <script is:inline define:vars={{ storageKey, isBase, paths: langPaths, colorCookie }}>
       document.documentElement.classList.add('js')
+      // The scheme is set before the first paint, so a night visitor never sees a day flash
+      // The same reading as `readColorMode` in colorMode.ts: an inline script cannot import it
+      if (colorCookie) {
+        const match = document.cookie.match(new RegExp('(?:^|; )' + colorCookie + '=(light|dark|system)(?:;|$)'))
+        const mode = match ? match[1] : 'system'
+        const dark = mode === 'dark' || (mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.scheme = dark ? 'dark' : 'light'
+      }
       if (isBase) {
         try {
           const picked = localStorage.getItem(storageKey)
