@@ -13,9 +13,11 @@ interface Props {
   copyright: string
   langLabel: string
   langNames: LangNames
+  /** Caption of the "cookie settings" button; set it only when the site mounts `Metrika`, the button reopens the banner */
+  cookieSettings?: string
 }
 
-const { lang, brand, homeLabel, tagline, navLabel, links, copyright, langLabel, langNames } = Astro.props
+const { lang, brand, homeLabel, tagline, navLabel, links, copyright, langLabel, langNames, cookieSettings } = Astro.props
 ---
 
 
@@ -41,6 +43,13 @@ const { lang, brand, homeLabel, tagline, navLabel, links, copyright, langLabel, 
     </nav>
     <div class="bottom">
       <p>{copyright}</p>
+      {
+        cookieSettings && (
+          <a class="cookie-settings" href="#cookie-settings" data-cookie-settings>
+            {cookieSettings}
+          </a>
+        )
+      }
       <ul class="langs" aria-label={langLabel}>
         {
           languages.map((code) => (
@@ -144,5 +153,14 @@ const { lang, brand, homeLabel, tagline, navLabel, links, copyright, langLabel, 
   .langs {
     display: flex;
     gap: 16px;
+  }
+
+  .cookie-settings {
+    color: var(--fg-muted);
+    text-decoration: underline;
+  }
+
+  .cookie-settings:hover {
+    color: var(--fg);
   }
 </style>

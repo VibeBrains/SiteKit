@@ -1,0 +1,133 @@
+---
+import { DEFAULT_TEXTS, CONSENT_COOKIE, isCounterId, type MetrikaTexts } from '../metrika'
+
+/**
+ * Yandex Metrika with the visitor's consent: a cookie banner and the tag, loaded only after "Agree"
+ * Put it once at the end of the page body
+ * Empty counter number: nothing is rendered and nothing is loaded, not even the banner
+ * Goals: mark a call to action with `data-goal="id"`; one handler reports it once the tag is loaded
+ */
+interface Props {
+  /** Counter number from the site config; empty or not digits switches Metrika off */
+  counterId: string
+  /** Address of the page that tells what is collected and how to refuse */
+  policyHref: string
+  /** Banner strings: the site passes its catalog, Russian is the default */
+  texts?: Partial<MetrikaTexts>
+  /** Name of the first-party cookie with the decision */
+  cookie?: string
+}
+
+const { counterId, policyHref, texts, cookie = CONSENT_COOKIE } = Astro.props
+const copy = { ...DEFAULT_TEXTS, ...texts }
+const on = isCounterId(counterId)
+---
+
+{
+  on && (
+    <div class="cookie" role="region" aria-label={copy.title} data-metrika data-counter={counterId} data-cookie={cookie} hidden>
+      <div class="cookie-card">
+        <div class="cookie-text">
+          <p class="cookie-title">{copy.title}</p>
+          <p class="cookie-body">{copy.body}</p>
+          <a class="cookie-policy" href={policyHref} data-cookie-policy>
+            {copy.policy}
+          </a>
+        </div>
+        <div class="cookie-actions">
+          <button type="button" class="cookie-btn cookie-btn--accept" data-cookie-accept>
+            {copy.accept}
+          </button>
+          <button type="button" class="cookie-btn" data-cookie-essential>
+            {copy.essential}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+{
+  on && (
+    <script>
+      import { initMetrika } from '../scripts/metrika'
+      initMetrika()
+    </script>
+  )
+}
+
+<style>
+  .cookie {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 60;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .cookie[hidden] {
+    display: none;
+  }
+
+  .cookie-card {
+    display: grid;
+    gap: 14px;
+    max-width: 760px;
+    margin-inline: auto;
+    padding: 16px;
+    border: 1px solid var(--border-strong, var(--border));
+    border-radius: var(--radius, 10px);
+    background: var(--surface, var(--bg));
+    color: var(--fg-soft, var(--fg));
+    box-shadow: 0 12px 40px rgb(0 0 0 / 0.35);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .cookie-title {
+    margin-bottom: 4px;
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  .cookie-body {
+    color: var(--fg-muted, var(--fg-soft));
+    white-space: pre-line;
+  }
+
+  .cookie-policy {
+    display: inline-block;
+    margin-top: 6px;
+    color: var(--brand-bright, var(--brand));
+    text-decoration: underline;
+  }
+
+  .cookie-actions {
+    display: grid;
+    gap: 8px;
+  }
+
+  .cookie-btn {
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--border-strong, var(--border));
+    border-radius: var(--radius, 10px);
+    background: transparent;
+    color: var(--fg);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .cookie-btn--accept {
+    border-color: transparent;
+    background: var(--brand);
+    color: var(--brand-ink, #fff);
+  }
+
+  @media (min-width: 720px) {
+    .cookie-card {
+      grid-template-columns: 1fr 200px;
+      align-items: center;
+      gap: 24px;
+    }
+  }
+</style>
