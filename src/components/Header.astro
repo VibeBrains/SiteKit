@@ -7,6 +7,8 @@ export interface NavLink {
   href: string
   label: string
   rel?: string
+  /** Metrika goal reported on click, see `components/Metrika.astro` */
+  goal?: string
 }
 
 /** One button of the header actions: the ghost one hides on narrow screens, the primary one stays */
@@ -52,7 +54,7 @@ const { lang, brand, homeLabel, navLabel, nav, langLabel, langNames, actions, co
     </a>
 
     <nav class="nav" aria-label={navLabel}>
-      {nav.map((item) => <a href={item.href} rel={item.rel}>{item.label}</a>)}
+      {nav.map((item) => <a href={item.href} rel={item.rel} data-goal={item.goal}>{item.label}</a>)}
     </nav>
 
     <div class="actions">
@@ -113,6 +115,7 @@ const { lang, brand, homeLabel, navLabel, nav, langLabel, langNames, actions, co
             class:list={['btn', action.kind === 'ghost' ? 'btn--ghost sign-in' : 'btn--primary start']}
             href={action.href}
             rel={action.rel}
+            data-goal={action.goal}
           >
             {action.label}
           </a>

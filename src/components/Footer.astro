@@ -35,7 +35,7 @@ const { lang, brand, homeLabel, tagline, navLabel, links, copyright, langLabel, 
         {
           links.map((link) => (
             <li>
-              <a href={link.href} rel={link.rel}>{link.label}</a>
+              <a href={link.href} rel={link.rel} data-goal={link.goal}>{link.label}</a>
             </li>
           ))
         }
