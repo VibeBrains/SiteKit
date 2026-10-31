@@ -15,7 +15,7 @@ export const productNames: Record<Product, string> = {
 
 /**
  * App icons of the family, as they ship — a redrawn mark drifts from the real one:
- * VibeIDE's from resources/darwin/code.icns of its repository, cropped to the tile
+ * VibeIDE's from resources/branding/vibeide-macos-icon.svg of its repository, cropped to the tile
  * VibeIDEA's from vibeidea-customization/resources/vibeidea.svg of its repository
  * VibeMemory's from public/favicon.svg of vibememory.ru
  */
