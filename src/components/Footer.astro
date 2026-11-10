@@ -13,11 +13,13 @@ interface Props {
   copyright: string
   langLabel: string
   langNames: LangNames
+  /** Подпись автора после копирайта: «Сделано в» и ссылка на сайт автора; без неё строки нет */
+  madeBy?: { label: string; site: string; href: string }
   /** Caption of the "cookie settings" button; set it only when the site mounts `Metrika`, the button reopens the banner */
   cookieSettings?: string
 }
 
-const { lang, brand, homeLabel, tagline, navLabel, links, copyright, langLabel, langNames, cookieSettings } = Astro.props
+const { lang, brand, homeLabel, tagline, navLabel, links, copyright, langLabel, langNames, madeBy, cookieSettings } = Astro.props
 ---
 
 
@@ -42,7 +44,18 @@ const { lang, brand, homeLabel, tagline, navLabel, links, copyright, langLabel, 
       </ul>
     </nav>
     <div class="bottom">
-      <p>{copyright}</p>
+      <p>
+        {copyright}
+        {
+          madeBy && (
+            <>
+              <span aria-hidden="true"> · </span>
+              {madeBy.label}{' '}
+              <a class="made-by" href={madeBy.href} target="_blank" rel="noopener">{madeBy.site}</a>
+            </>
+          )
+        }
+      </p>
       {
         cookieSettings && (
           <a class="cookie-settings" href="#cookie-settings" data-cookie-settings>
@@ -161,6 +174,15 @@ const { lang, brand, homeLabel, tagline, navLabel, links, copyright, langLabel, 
   }
 
   .cookie-settings:hover {
+    color: var(--fg);
+  }
+
+  .made-by {
+    color: var(--fg-muted);
+    text-decoration: underline;
+  }
+
+  .made-by:hover {
     color: var(--fg);
   }
 </style>
