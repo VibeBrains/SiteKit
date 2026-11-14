@@ -82,11 +82,19 @@ const loadMetrika = (counterId: string): void => {
   ym(Number(counterId), 'init', COUNTER_OPTIONS)
 }
 
+/**
+ * Sends a goal from site code, for choices a click handler does not see (a radio group switched with arrow keys)
+ * Without a loaded Metrika or with an invalid id it does nothing, like the `data-goal` handler
+ */
+export const reachGoal = (goal: string | null | undefined): void => {
+  if (loadedCounter === null || !isGoalId(goal)) return
+  window.ym?.(Number(loadedCounter), 'reachGoal', goal)
+}
+
 /** One handler for every call to action marked with `data-goal`; without a loaded Metrika it does nothing */
 const onGoalClick = (event: MouseEvent): void => {
-  if (loadedCounter === null || !(event.target instanceof Element)) return
-  const goal = event.target.closest(`[${GOAL_ATTRIBUTE}]`)?.getAttribute(GOAL_ATTRIBUTE)
-  if (isGoalId(goal)) window.ym?.(Number(loadedCounter), 'reachGoal', goal)
+  if (!(event.target instanceof Element)) return
+  reachGoal(event.target.closest(`[${GOAL_ATTRIBUTE}]`)?.getAttribute(GOAL_ATTRIBUTE))
 }
 
 /**
